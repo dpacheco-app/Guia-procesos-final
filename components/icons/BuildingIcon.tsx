@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export const BuildingIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
