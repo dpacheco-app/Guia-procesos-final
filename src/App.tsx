@@ -27,6 +27,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ history, onHistoryClick, 
           onClick={() => onHistoryClick(item)}
           disabled={isLoading}
           className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label={`Buscar de nuevo: ${item}`}
         >
           {item}
         </button>
@@ -211,7 +212,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-4xl mx-auto">
         <header className="text-center mb-8">
           <div className="flex justify-center items-center gap-4 mb-4">
-            <BuildingIcon className="w-12 h-12 text-cyan-400" />
+            <BuildingIcon className="w-12 h-12 text-cyan-400" aria-hidden="true" />
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
               GUIA PROCESOS CONSTRUCTIVOS
             </h1>
@@ -233,8 +234,9 @@ const App: React.FC = () => {
               <button
                 onClick={handlePrint}
                 className="flex items-center justify-center px-5 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-green-500 transition-colors duration-300"
+                aria-label="Imprimir o guardar resumen como PDF"
               >
-                <PrintIcon className="w-5 h-5 mr-2" />
+                <PrintIcon className="w-5 h-5 mr-2" aria-hidden="true" />
                 Imprimir Resumen (PDF)
               </button>
             </div>
@@ -243,7 +245,7 @@ const App: React.FC = () => {
           {isLoading && <Loader />}
 
           {error && (
-            <div className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-center backdrop-blur-sm">
+            <div role="alert" className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-center backdrop-blur-sm">
               <p className="font-semibold">Error al obtener la información</p>
               <p className="text-sm">{error}</p>
             </div>

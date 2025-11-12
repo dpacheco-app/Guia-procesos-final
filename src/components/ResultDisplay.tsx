@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { SearchResult } from '../types';
 import { DownloadIcon } from './icons/DownloadIcon';
 
@@ -19,7 +19,19 @@ const ImageLoader: React.FC = () => (
     </div>
 );
 
+// Helper function to parse simple markdown like **bold**
+const parseBoldText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-bold text-white">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+    });
+};
+
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({ searchResult, imageUrl, imageError, query, printRef, isImageLoading, handlePrintImage }) => {
+    const [isTxtCopied, setIsTxtCopied] = useState(false);
     
     const handleExportTxt = () => {
         if (!searchResult || !searchResult.text) return;
@@ -38,39 +50,40 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ searchResult, imag
         
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        
+        setIsTxtCopied(true);
+        setTimeout(() => setIsTxtCopied(false), 2000);
     };
 
     // Markdown-to-HTML simplificado y limpio
     const formattedText = searchResult.text.split('\n').map((line, index) => {
-        let processedLine = line.replace(/\*\*/g, ''); // Eliminar asteriscos para controlar el formato
-
         // Encabezado Nivel 1
-        if (processedLine.startsWith('# ')) {
+        if (line.startsWith('# ')) {
             return (
                 <h1 key={index} className="text-3xl font-extrabold text-white mt-4 mb-4">
-                    {processedLine.substring(2)}
+                    {parseBoldText(line.substring(2))}
                 </h1>
             );
         }
         // Encabezado Nivel 2
-        if (processedLine.startsWith('## ')) {
+        if (line.startsWith('## ')) {
             return (
                 <h2 key={index} className="text-2xl font-bold text-cyan-400 mt-6 mb-3 border-b border-gray-600 pb-2">
-                    {processedLine.substring(3)}
+                    {parseBoldText(line.substring(3))}
                 </h2>
             );
         }
         // Manejar ### y otros niveles de encabezado para que no muestren los '#'
-        if (processedLine.trim().startsWith('###')) {
+        if (line.trim().startsWith('###')) {
             return (
                 <p key={index} className="text-lg font-semibold text-gray-200 mt-4 mb-1">
-                    {processedLine.trim().replace(/#+\s*/, '')}
+                    {parseBoldText(line.trim().replace(/#+\s*/, ''))}
                 </p>
             );
         }
         // Lista numerada
-        if (/^\s*\d+\.\s/.test(processedLine)) {
-            const trimmedLine = processedLine.trim();
+        if (/^\s*\d+\.\s/.test(line)) {
+            const trimmedLine = line.trim();
             const colonIndex = trimmedLine.indexOf(':');
 
             if (colonIndex > -1) {
@@ -79,27 +92,27 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ searchResult, imag
                 return (
                     <p key={index} className="mb-2 text-gray-300">
                         <strong className="font-bold text-white">{heading}</strong>
-                        <span>{body}</span>
+                        <span>{parseBoldText(body)}</span>
                     </p>
                 );
             }
-             return <p key={index} className="mb-2 text-gray-300 font-bold">{trimmedLine}</p>;
+             return <p key={index} className="mb-2 text-gray-300 font-bold">{parseBoldText(trimmedLine)}</p>;
         }
         // Lista con viñetas
-        if (processedLine.startsWith('* ') || processedLine.startsWith('- ')) {
+        if (line.startsWith('* ') || line.startsWith('- ')) {
             return (
                  <div key={index} className="flex items-start mb-2 pl-4">
                     <span className="mr-2 text-cyan-400 leading-relaxed">•</span>
-                    <p className="text-gray-300 flex-1">{processedLine.substring(2)}</p>
+                    <p className="text-gray-300 flex-1">{parseBoldText(line.substring(2))}</p>
                 </div>
             );
         }
         // Línea en blanco
-        if (processedLine.trim() === '') {
+        if (line.trim() === '') {
             return <br key={index} />;
         }
         // Párrafo por defecto
-        return <p key={index} className="mb-2 text-gray-300">{processedLine}</p>;
+        return <p key={index} className="mb-2 text-gray-300">{parseBoldText(line)}</p>;
     });
 
     return (
@@ -116,9 +129,10 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ searchResult, imag
                                 onClick={handleExportTxt}
                                 className="flex-shrink-0 ml-4 flex items-center justify-center px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-cyan-500 transition-colors duration-300"
                                 title="Descargar resumen como archivo de texto (.txt)"
+                                aria-label="Descargar resumen como archivo de texto"
                             >
-                                <DownloadIcon className="w-5 h-5 mr-2" />
-                                <span>.txt</span>
+                                <DownloadIcon className="w-5 h-5 mr-2" aria-hidden="true" />
+                                <span>{isTxtCopied ? 'Copiado!' : '.txt'}</span>
                             </button>
                         </div>
                         
@@ -141,14 +155,15 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ searchResult, imag
                                     <button
                                         onClick={handlePrintImage}
                                         className="flex items-center justify-center px-5 py-2.5 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-green-500 transition-colors duration-300"
+                                        aria-label="Descargar esquema ilustrativo como PDF"
                                     >
-                                        <DownloadIcon className="w-5 h-5 mr-2" />
+                                        <DownloadIcon className="w-5 h-5 mr-2" aria-hidden="true" />
                                         Descargar Esquema (PDF)
                                     </button>
                                 </div>
                             </div>
                         ) : imageError ? (
-                            <div className="bg-yellow-900/50 border border-yellow-700 text-yellow-300 px-4 py-3 rounded-lg text-center">
+                            <div role="alert" className="bg-yellow-900/50 border border-yellow-700 text-yellow-300 px-4 py-3 rounded-lg text-center">
                                 <p>{imageError}</p>
                             </div>
                         ) : null}
