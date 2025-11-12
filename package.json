@@ -1,23 +1,15 @@
 {
-  "name": "guia-procesos-constructivos-v-2",
+  "name": "guia-procesos-constructivos",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
+  "description": "Una aplicación web que proporciona descripciones detalladas de procesos constructivos, basadas en la normativa colombiana, y genera esquemas ilustrativos y PDFs descargables.",
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
     "@google/genai": "^1.29.0",
-    "next": "^16.0.2"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+  "scripts": {
+    "start": "echo 'No start script configured. Serve index.html from a static server.'",
+    "build": "echo 'No build script configured. This project uses ES modules and import maps.'"
   }
 }
