@@ -1,7 +1,7 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import type { GroundingChunk } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
 
 /**
  * Genera un informe técnico del proceso constructivo con streaming y fuentes.
